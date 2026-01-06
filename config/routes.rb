@@ -13,6 +13,7 @@ Rails.application.routes.draw do
 
   resource :users, only: [ :new, :create ]
   resource :sessions, only: [ :new, :create, :destroy ]
+  resources :events, only: [ :show, :index, :new, :create ]
 
   get "signup", to: "users#new"
   get "login", to: "sessions#new"
