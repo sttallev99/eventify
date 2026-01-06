@@ -1,9 +1,40 @@
-<h1>Log In</h1>
+<div class="flex min-h-full flex-col w-full justify-center px-6 py-12 lg:px-8">
+  <div class="sm:mx-auto sm:w-full sm:max-w-sm">
+    <%= image_tag "eventify_logo.jpg", class: "mx-auto h-10 w-auto" %>
+    <h2 class="mt-4 text-center text-2xl/9 font-bold tracking-tight text-black">Sign in to your account</h2>
+  </div>
 
-<%= form_with url: sessions_path do |f| %>
-    <%= f.email_field :email %>
-    <%= f.password_field :password %>
-    <%= f.submit "Log in" %>
-<% end %>
+  <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-sm">
+    <%= form_with url: sessions_path do |f| %>
+      <div class="space-y-6">
+        <div>
+          <%= f.label :email, "Email address", class: "block text-sm/6 font-medium text-black" %>
+          <div class="mt-2">
+            <%= f.email_field :email, class: "block border w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-black placeholder:text-gray-500 sm:text-sm/6" %>
+          </div>
+        </div>
 
-<%= link_to "Don't have an account?", signup_path%>
+        <div>
+          <div class="flex items-center justify-between">
+            <%= f.label :password, "Password", class: "block text-sm/6 font-medium text-black" %>
+            <div class="text-sm">
+              <a href="#" class="font-semibold text-black">Forgot password?</a>
+            </div>
+          </div>
+          <div class="mt-2">
+            <%= f.password_field :password, class: "block border w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-black placeholder:text-gray-500 sm:text-sm/6" %>
+          </div>
+        </div>
+      </div>
+      <div class="mt-6">
+        <%= f.submit "Log in", class: "flex w-full justify-center rounded-md bg-indigo-500 px-3 py-1.5 text-sm/6 font-semibold text-black hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500" %>
+      </div>
+    <% end %>
+    <p class="mt-3 text-center text-sm/6 text-gray-400">
+      Don't have an account?
+      <span>
+        <%= link_to " Register now!", signup_path, class: "font-semibold text-black hover:text-indigo-300" %>
+      </span>
+    </p>
+  </div>
+</div>
