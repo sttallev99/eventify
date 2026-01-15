@@ -12,8 +12,9 @@ Rails.application.routes.draw do
   # root "posts#index"
 
   resource :users, only: [ :new, :create ]
-  resource :sessions, only: [ :new, :create, :destroy ]
-  resources :events, only: [ :show, :index, :new, :create ]
+  resource :sessions, only: [ :new, :create ]
+  resources :events
+  resources :categories
 
   get "signup", to: "users#new"
   get "login", to: "sessions#new"

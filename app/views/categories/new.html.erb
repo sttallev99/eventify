@@ -1,0 +1,16 @@
+<%= form_with model: @category do |f| %>
+  <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-sm">
+    <div>
+      <%= f.label :name, "Category Name", class: "block text-sm/6 font-medium text-black" %>
+      <div class="mt-2">
+        <%= f.text_field :name, class: "block border w-full rounded-md bg-white/5 px-3 py-1.5 text-base text-black placeholder:text-gray-500 sm:text-sm/6" %>
+      </div>
+    </div>
+
+    <div class="mt-6 flex justify-center">
+      <%= f.submit "Create Category", class: "w-1/2 rounded-md bg-indigo-500 px-3 py-1.5 text-sm/6 font-semibold text-black border-none
+                hover:bg-indigo-400 focus-visible:outline-2 focus-visible:outline-offset-2
+                focus-visible:outline-indigo-500" %>
+    </div>
+  </div>
+<% end %>

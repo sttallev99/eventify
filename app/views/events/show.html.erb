@@ -1,0 +1,101 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+  <!-- Event Header -->
+  <div class="flex flex-col lg:flex-row lg:justify-between lg:items-center mb-8">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900"><%= @event.title %></h1>
+      <p class="mt-2 text-gray-600">
+        <span class="font-medium">Location:</span> <%= @event.location %> |
+        <span class="font-medium">Category:</span> <%= @event.category.name %> |
+        <span class="font-medium">Organizer:</span> <%= @event.user.first_name %> <%= @event.user.last_name %>
+      </p>
+      <p class="mt-1 text-gray-500">
+        <span class="font-medium">Dates:</span>
+        <%= @event.starts_at.strftime("%B %d, %Y") %> –
+        <%= @event.ends_at.strftime("%B %d, %Y") %>
+      </p>
+      <p class="mt-1">
+        <span class="inline-block px-3 py-1 rounded-full text-sm font-medium 
+          <%= @event.status == 'published' ? 'bg-green-100 text-green-800' : 
+              @event.status == 'draft' ? 'bg-gray-100 text-gray-800' : 
+              'bg-red-100 text-red-800' %>">
+          <%= @event.status.capitalize %>
+        </span>
+      </p>
+    </div>
+
+    <!-- Event Images Carousel / Gallery -->
+    <% if @event.images.attached? %>
+      <div class="mt-6 lg:mt-0 flex gap-3 overflow-x-auto">
+        <% @event.images.each do |img| %>
+          <%= image_tag img.variant(resize_to_limit: [400, 250]), class: "rounded-lg shadow-lg flex-shrink-0" %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Event Description -->
+  <div class="prose prose-indigo max-w-full mb-10">
+    <%= @event.description %>
+  </div>
+
+  <!-- Tickets Section -->
+  <div class="mb-10">
+    <h2 class="text-2xl font-semibold mb-4">Tickets 🎟</h2>
+    <% if @event.tickets.any? %>
+      <div class="overflow-x-auto">
+        <table class="min-w-full border border-gray-200 rounded-lg divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Name</th>
+              <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Price</th>
+              <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Quantity</th>
+              <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Sold</th>
+              <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Description</th>
+              <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Sales Period</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <% @event.tickets.each do |ticket| %>
+              <tr>
+                <td class="px-4 py-2"><%= ticket.name %></td>
+                <td class="px-4 py-2">€<%= (ticket.price_cents / 100.0).round(2) %></td>
+                <td class="px-4 py-2"><%= ticket.quantity_total %></td>
+                <td class="px-4 py-2"><%= ticket.quantity_sold %></td>
+                <td class="px-4 py-2"><%= ticket.description.presence || "-" %></td>
+                <td class="px-4 py-2">
+                  <% if ticket.sales_start_at && ticket.sales_end_at %>
+                    <%= ticket.sales_start_at.strftime("%b %d, %Y") %> – <%= ticket.sales_end_at.strftime("%b %d, %Y") %>
+                  <% else %>
+                    N/A
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <p class="text-gray-500">No tickets available for this event.</p>
+    <% end %>
+  </div>
+
+  <!-- Comments Section -->
+  <div>
+    <h2 class="text-2xl font-semibold mb-4">Comments 💬</h2>
+    <% if @event.comment.any? %>
+      <div class="space-y-4">
+        <% @event.comment.each do |c| %>
+          <div class="border rounded-lg p-4 bg-gray-50">
+            <p class="text-gray-800"><%= c.content %></p>
+            <p class="text-gray-500 text-sm mt-1">
+              Posted by <%= c.user.first_name %> <%= c.user.last_name %> 
+              on <%= c.created_at.strftime("%b %d, %Y %H:%M") %>
+            </p>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="text-gray-500">No comments yet.</p>
+    <% end %>
+  </div>
+</div>

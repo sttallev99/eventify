@@ -10,9 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_12_02_203549) do
+ActiveRecord::Schema[8.0].define(version: 2026_01_12_175109) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+  enable_extension "pgcrypto"
 
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.string "name", null: false
@@ -52,61 +53,74 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_02_203549) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
-  create_table "categories", force: :cascade do |t|
+  create_table "categories", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["name"], name: "index_categories_on_name"
+    t.index ["name"], name: "index_categories_on_name", unique: true
   end
 
-  create_table "comments", force: :cascade do |t|
+  create_table "comments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.text "content", null: false
+    t.uuid "event_id", null: false
+    t.uuid "user_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "events_id", null: false
-    t.bigint "users_id", null: false
-    t.index ["events_id"], name: "index_comments_on_events_id"
-    t.index ["users_id"], name: "index_comments_on_users_id"
+    t.index ["event_id"], name: "index_comments_on_event_id"
+    t.index ["user_id"], name: "index_comments_on_user_id"
   end
 
-  create_table "events", force: :cascade do |t|
+  create_table "events", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "title", null: false
     t.datetime "starts_at", null: false
     t.datetime "ends_at", null: false
     t.string "location", null: false
-    t.boolean "published", null: false
+    t.string "status", default: "draft"
+    t.uuid "user_id", null: false
+    t.uuid "category_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "user_id", null: false
-    t.bigint "category_id", null: false
     t.index ["category_id"], name: "index_events_on_category_id"
     t.index ["user_id"], name: "index_events_on_user_id"
+    t.check_constraint "status::text = ANY (ARRAY['draft'::character varying, 'published'::character varying, 'cancelled'::character varying, 'out_of_stock'::character varying, 'archived'::character varying]::text[])", name: "status_check"
   end
 
-  create_table "tickets", force: :cascade do |t|
-    t.decimal "price", null: false
-    t.integer "quantity", null: false
+  create_table "tickets", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.integer "price_cents", default: 0, null: false
+    t.integer "quantity_total", null: false
+    t.uuid "event_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.bigint "events_id", null: false
-    t.index ["events_id"], name: "index_tickets_on_events_id"
+    t.integer "quantity_sold", default: 0, null: false
+    t.string "name", default: "Regular", null: false
+    t.text "description"
+    t.datetime "sales_start_at"
+    t.datetime "sales_end_at"
+    t.string "currency", default: "EUR", null: false
+    t.index ["event_id", "name"], name: "index_tickets_on_event_id_and_name", unique: true
+    t.index ["event_id"], name: "index_tickets_on_event_id"
+    t.check_constraint "price_cents >= 0", name: "price_cents_non_negative"
+    t.check_constraint "quantity_sold <= quantity_total", name: "qty_sold_not_exceed_total"
+    t.check_constraint "quantity_sold >= 0", name: "qty_sold_non_negative"
+    t.check_constraint "quantity_total >= 0", name: "qty_total_non_negative"
   end
 
-  create_table "users", force: :cascade do |t|
+  create_table "users", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "email", null: false
     t.string "password_digest", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
     t.string "first_name", null: false
     t.string "last_name", null: false
-    t.boolean "is_admin", default: false, null: false
+    t.boolean "is_admin", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["email"], name: "index_users_on_email", unique: true
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
-  add_foreign_key "comments", "events", column: "events_id"
-  add_foreign_key "comments", "users", column: "users_id"
+  add_foreign_key "comments", "events"
+  add_foreign_key "comments", "users"
   add_foreign_key "events", "categories"
   add_foreign_key "events", "users"
-  add_foreign_key "tickets", "events", column: "events_id"
+  add_foreign_key "tickets", "events"
 end
