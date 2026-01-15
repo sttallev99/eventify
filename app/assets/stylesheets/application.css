@@ -12,6 +12,49 @@
 @tailwind components;
 @tailwind utilities;
 
-input {
-  border: 1px solid black;
+trix-editor {
+  @apply min-h-[180px] w-full rounded-lg border border-gray-300 bg-white px-4 py-3;
+  @apply text-sm leading-relaxed text-gray-800;
+  @apply focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500;
+  @apply transition-shadow transition-colors duration-150;
+}
+
+trix-editor:empty::before {
+  @apply text-gray-400;
+}
+
+trix-toolbar {
+  @apply mb-2;
+}
+
+trix-toolbar .trix-button-group {
+  @apply overflow-hidden rounded-lg border border-gray-300 bg-gray-50;
+}
+
+trix-toolbar .trix-button {
+  @apply border-0 bg-transparent text-gray-600 hover:bg-gray-100 hover:text-gray-900;
+}
+
+trix-toolbar .trix-button.trix-active {
+  @apply bg-indigo-100 text-indigo-700;
+}
+
+trix-toolbar .trix-button-group:not(:last-child) {
+  @apply mr-2;
+}
+
+trix-editor .trix-content {
+  @apply space-y-2;
+}
+
+trix-editor a {
+  @apply text-indigo-600 underline hover:text-indigo-800;
+}
+
+.field_with_errors trix-editor {
+  @apply border-red-500 ring-2 ring-red-500;
+}
+
+.field_with_errors trix-toolbar .trix-button-group {
+  @apply border-red-300;
 }

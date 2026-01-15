@@ -109,6 +109,8 @@ GEM
     erubi (1.13.1)
     et-orbi (1.4.0)
       tzinfo
+    faker (2.23.0)
+      i18n (>= 1.8.11, < 2)
     ffi (1.17.2-x64-mingw-ucrt)
     ffi (1.17.2-x86_64-linux-gnu)
     fugit (1.12.1)
@@ -163,6 +165,15 @@ GEM
       logger
     mini_mime (1.1.5)
     minitest (5.26.1)
+    monetize (1.9.4)
+      money (~> 6.12)
+    money (6.13.8)
+      i18n (>= 0.6.4, <= 2)
+    money-rails (1.13.4)
+      activesupport (>= 3.0)
+      monetize (~> 1.9.0)
+      money (~> 6.13.2)
+      railties (>= 3.0)
     msgpack (1.8.0)
     net-imap (0.5.12)
       date
@@ -366,10 +377,12 @@ DEPENDENCIES
   brakeman
   capybara
   debug
+  faker (~> 2.20)
   image_processing (~> 1.2)
   importmap-rails
   jbuilder
   kamal
+  money-rails (~> 1.13.0)
   pg (~> 1.1)
   propshaft
   puma (>= 5.0)
