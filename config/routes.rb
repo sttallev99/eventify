@@ -15,10 +15,25 @@ Rails.application.routes.draw do
   resource :sessions, only: [ :new, :create ]
   resources :events
   resources :categories
+  resources :purchases, only: [ :index ]
 
   get "signup", to: "users#new"
   get "login", to: "sessions#new"
   delete "logout", to: "sessions#destroy"
 
   root "dashboard#index"
+
+  namespace :api do
+    namespace :v1 do
+      post "register", to: "auth#register"
+      post "login", to: "auth#login"
+
+      resources :events, only: [ :index, :show ] do
+        resources :tickets, only: [] do
+          resources :purchases, only: [ :create ]
+        end
+        resources :comments, only: [ :index, :create ]
+      end
+    end
+  end
 end

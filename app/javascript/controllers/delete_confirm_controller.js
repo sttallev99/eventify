@@ -4,11 +4,9 @@ export default class extends Controller {
   delete(event) {
     event.preventDefault();
 
-    // Show custom modal
     const modal = document.getElementById("deleteModal");
     modal.classList.remove("hidden");
 
-    // Store the link to delete
     window.deleteLink = this.element;
   }
 
@@ -18,7 +16,7 @@ export default class extends Controller {
     if (window.deleteLink) {
       const href = window.deleteLink.href;
       const csrfToken = document.querySelector(
-        'meta[name="csrf-token"]'
+        'meta[name="csrf-token"]',
       ).content;
 
       fetch(href, {

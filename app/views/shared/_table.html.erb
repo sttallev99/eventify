@@ -1,0 +1,96 @@
+<div class="overflow-x-auto">
+  <table class="min-w-full divide-y divide-gray-200">
+    <thead class="hidden bg-gray-50 sm:table-header-group">
+        <tr>
+        <% columns.each do |col| %>
+            <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600"><%= col[:header] %></th>
+        <% end %>
+        </tr>
+    </thead>
+    <tbody class="divide-y divide-gray-100 bg-white">
+      <% records.each do |record| %>
+        <tr class="block border-b border-gray-200 p-4 hover:bg-gray-50 sm:table-row sm:border-0 sm:p-0">
+            <% columns.each do |col| %>
+                <td class="flex justify-between py-2 text-sm text-gray-600 sm:table-cell sm:px-6 sm:py-4">
+                    <% if col[:value] %>
+                        <%= instance_exec(record, &col[:value]) %>
+                    <% else %>
+                        <%= record.public_send(col[:attribute]) %>
+                    <% end %>
+                </td>
+            <% end %>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<% if defined?(pagination) && pagination %>
+    <% current_page = pagination[:current_page] %>
+    <% total_pages  = pagination[:total_pages] %>
+    <% total_count  = pagination[:total_count] %>
+    <% path_helper  = pagination[:path_helper] %>
+
+    <% if total_count > 0 %>
+        <div class="flex flex-col gap-4 border-t border-gray-200 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
+        
+        <!-- Results info -->
+        <p class="text-sm text-gray-600">
+            Showing <span class="font-medium"><%= (current_page - 1) * 10 + 1 %></span> to
+            <span class="font-medium"><%= [current_page * 10, total_count].min %></span> of
+            <span class="font-medium"><%= total_count %></span> items
+        </p>
+
+        <!-- Pagination controls -->
+        <div class="flex items-center justify-between gap-2 sm:justify-end">
+            <%# mobile prev/next %>
+            <div class="flex w-full gap-2 sm:hidden">
+            <% if current_page > 1 %>
+                <%= link_to "Previous", path_helper.call(current_page - 1),
+                class: "w-full rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100" %>
+            <% else %>
+                <button disabled class="w-full rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-400 cursor-not-allowed">
+                Previous
+                </button>
+            <% end %>
+
+            <% if current_page < total_pages %>
+                <%= link_to "Next", path_helper.call(current_page + 1),
+                class: "w-full rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500" %>
+            <% else %>
+                <button disabled class="w-full rounded-md bg-gray-400 px-4 py-2 text-sm font-semibold text-white cursor-not-allowed">
+                Next
+                </button>
+            <% end %>
+            </div>
+
+            <%# desktop page numbers %>
+            <div class="hidden items-center gap-1 sm:flex">
+            <% if current_page > 1 %>
+                <%= link_to "Previous", path_helper.call(current_page - 1), class: "rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100" %>
+            <% else %>
+                <button disabled class="rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-400 cursor-not-allowed">
+                Previous
+                </button>
+            <% end %>
+
+            <% (1..total_pages).each do |page| %>
+                <% if page == current_page %>
+                <button class="rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white"><%= page %></button>
+                <% else %>
+                <%= link_to page, path_helper.call(page), class: "rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100" %>
+                <% end %>
+            <% end %>
+
+            <% if current_page < total_pages %>
+                <%= link_to "Next", path_helper.call(current_page + 1), class: "rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100" %>
+            <% else %>
+                <button disabled class="rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-400 cursor-not-allowed">
+                Next
+                </button>
+            <% end %>
+            </div>
+        </div>
+        </div>
+    <% end %>
+<% end %>

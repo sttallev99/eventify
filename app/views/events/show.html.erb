@@ -23,14 +23,33 @@
       </p>
     </div>
 
-    <!-- Event Images Carousel / Gallery -->
-    <% if @event.images.attached? %>
-      <div class="mt-6 lg:mt-0 flex gap-3 overflow-x-auto">
-        <% @event.images.each do |img| %>
-          <%= image_tag img.variant(resize_to_limit: [400, 250]), class: "rounded-lg shadow-lg flex-shrink-0" %>
-        <% end %>
-      </div>
-    <% end %>
+    <div data-controller="image-slider" class="relative w-full max-w-2xl mx-auto">
+      <% if @event.images.attached? %>
+        <div class="overflow-hidden rounded-lg h-96 w-full">
+          <% @event.images.each do |img| %>
+            <div data-image-slider-target="slide" class="hidden w-full h-full">
+              <%= image_tag url_for(img),
+                            class: "w-full h-full object-cover rounded-lg" %>
+            </div>
+          <% end %>
+        </div>
+
+        <!-- Navigation buttons -->
+        <button data-action="click->image-slider#prev"
+                class="absolute left-2 top-1/2 transform -translate-y-1/2 bg-black/30 text-white p-2 rounded-full hover:bg-black/50">
+          &#8592;
+        </button>
+        <button data-action="click->image-slider#next"
+                class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-black/30 text-white p-2 rounded-full hover:bg-black/50">
+          &#8594;
+        </button>
+      <% else %>
+        <div class="flex justify-center items-center w-full ">
+          <p class="text-gray-500 text-center text-lg">No images uploaded for this event.</p>
+        </div>
+      <% end %>
+    </div>
+
   </div>
 
   <!-- Event Description -->
@@ -57,7 +76,7 @@
           <tbody class="bg-white divide-y divide-gray-200">
             <% @event.tickets.each do |ticket| %>
               <tr>
-                <td class="px-4 py-2"><%= ticket.name %></td>
+                <td class="px-4 py-2"><%= ticket.ticket_type.humanize %></td>
                 <td class="px-4 py-2">€<%= (ticket.price_cents / 100.0).round(2) %></td>
                 <td class="px-4 py-2"><%= ticket.quantity_total %></td>
                 <td class="px-4 py-2"><%= ticket.quantity_sold %></td>
@@ -82,9 +101,9 @@
   <!-- Comments Section -->
   <div>
     <h2 class="text-2xl font-semibold mb-4">Comments 💬</h2>
-    <% if @event.comment.any? %>
+    <% if @event.comments.any? %>
       <div class="space-y-4">
-        <% @event.comment.each do |c| %>
+        <% @event.comments.each do |c| %>
           <div class="border rounded-lg p-4 bg-gray-50">
             <p class="text-gray-800"><%= c.content %></p>
             <p class="text-gray-500 text-sm mt-1">

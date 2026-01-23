@@ -1,0 +1,15 @@
+<h1>Thank you for your purchase 🎉</h1>
+
+<p>Hello <%= @purchase.user.first_name %>,</p>
+
+<p>
+    You bought <strong><%= @purchase.quantity %></strong> ticket(s) for:
+</p>
+
+<p>
+    Event: <strong><%= @purchase.ticket.event.title %></strong><br>
+    Ticket type: <strong><%= @purchase.ticket.ticket_type.humanize %></strong><br>
+    Total: <strong><%= @purchase.total_price_cents / 100.0 %> <%= @purchase.ticket.currency %></strong>
+</p>
+
+<p>Enjoy the event! 🎶</p>

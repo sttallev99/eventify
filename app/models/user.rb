@@ -3,6 +3,7 @@ class User < ApplicationRecord
 
   has_many :comments, dependent: :destroy
   has_many :events, dependent: :destroy
+  has_many :purchases, dependent: :destroy
 
   has_one_attached :avatar
 

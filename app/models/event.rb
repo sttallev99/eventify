@@ -5,8 +5,8 @@ class Event < ApplicationRecord
   has_many :tickets, dependent: :destroy
   accepts_nested_attributes_for :tickets, allow_destroy: true
 
-  has_many :comment, dependent: :destroy
-  validates_associated :comment
+  has_many :comments, dependent: :destroy
+  validates_associated :comments
 
 
   has_many_attached :images

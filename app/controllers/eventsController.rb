@@ -10,9 +10,15 @@ class EventsController < ApplicationController
   end
 
   def create
-    @event = current_user.events.build(event_params)
+    # build event without images
+    @event = current_user.events.build(event_params.except(:images))
+
+    # save the event first
     if @event.save
-      redirect_to root_path, notice: "Event created"
+      # attach images after save
+      @event.images.attach(event_params[:images]) if event_params[:images].present?
+
+      redirect_to @event, notice: "Event created"
     else
       render :new, status: :unprocessable_entity
     end
@@ -23,12 +29,28 @@ class EventsController < ApplicationController
   end
 
   def update
-    if @event.update(event_params)
-      redirect_to root_path, notice: "Event updated"
+    # remove images marked for deletion
+    if params[:event][:remove_image_ids].present?
+      params[:event][:remove_image_ids].each do |id|
+        attachment = @event.images.find_by(id: id)
+        attachment.purge if attachment
+      end
+    end
+
+    # update other event attributes (excluding images)
+    if @event.update(event_params.except(:images))
+      # attach new images if any
+      if event_params[:images].present?
+        @event.images.attach(event_params[:images])
+      end
+
+      redirect_to @event, notice: "Event updated"
     else
+      Rails.logger.error(@event.errors.full_messages)
       render :edit, status: :unprocessable_entity
     end
   end
+
 
   def destroy
     @event.destroy
@@ -53,12 +75,17 @@ class EventsController < ApplicationController
       :cancelled,
       tickets_attributes: [
         :id,
-        :name,
+        :ticket_type,
         :price,
+        :description,
         :quantity_total,
         :quantity_sold,
+        :sales_start_at,
+        :sales_end_at,
         :_destroy
-      ]
+      ],
+      images: [],
+      remove_image_ids: []
     )
   end
 end

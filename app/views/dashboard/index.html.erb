@@ -66,117 +66,14 @@
   </div>
 <% end %>
 
-
-<div class="overflow-x-auto">
-  <table class="min-w-full divide-y divide-gray-200">
-    
-    <!-- Table Head (hidden on mobile) -->
-    <thead class="hidden bg-gray-50 sm:table-header-group">
-      <tr>
-        <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">
-          Event Name
-        </th>
-        <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">
-          Start Date
-        </th>
-        <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">
-          End Date
-        </th>
-        <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">
-          Location
-        </th>
-        <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">
-          Status
-        </th>
-        <th class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-600">
-          Actions
-        </th>
-      </tr>
-    </thead>
-
-    <tbody class="divide-y divide-gray-100 bg-white">
-      <% @events.each do |event| %>
-        <%= render "tableRow", event: event %>
-      <% end %>
-    </tbody>
-  </table>
-</div>
-
-<!-- Pagination -->
-<% if @total_events > 0 %>
-  <div class="flex flex-col gap-4 border-t border-gray-200 px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
-    
-    <!-- Results info -->
-    <p class="text-sm text-gray-600">
-      Showing <span class="font-medium"><%= (@current_page - 1) * 10 + 1 %></span> to <span class="font-medium"><%= [@current_page * 10, @total_events].min %></span> of
-      <span class="font-medium"><%= @total_events %></span> events
-    </p>
-
-    <!-- Pagination controls -->
-    <div class="flex items-center justify-between gap-2 sm:justify-end">
-      
-      <!-- Mobile: Prev / Next -->
-      <div class="flex w-full gap-2 sm:hidden">
-        <% if @current_page > 1 %>
-          <%= link_to "Previous", root_path(params.to_unsafe_h.merge(page: @current_page - 1)), 
-            class: "w-full rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100" %>
-        <% else %>
-          <button disabled
-            class="w-full rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-400 cursor-not-allowed"
-          >
-            Previous
-          </button>
-        <% end %>
-        
-        <% if @current_page < @total_pages %>
-          <%= link_to "Next", root_path(params.to_unsafe_h.merge(page: @current_page + 1)), 
-            class: "w-full rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-500" %>
-        <% else %>
-          <button disabled
-            class="w-full rounded-md bg-gray-400 px-4 py-2 text-sm font-semibold text-white cursor-not-allowed"
-          >
-            Next
-          </button>
-        <% end %>
-      </div>
-
-      <!-- Desktop: Page numbers -->
-      <div class="hidden items-center gap-1 sm:flex">
-        <% if @current_page > 1 %>
-          <%= link_to "Previous", root_path(params.to_unsafe_h.merge(page: @current_page - 1)), 
-            class: "rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100" %>
-        <% else %>
-          <button disabled
-            class="rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-400 cursor-not-allowed"
-          >
-            Previous
-          </button>
-        <% end %>
-
-        <% (1..@total_pages).each do |page| %>
-          <% if page == @current_page %>
-            <button class="rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold text-white">
-              <%= page %>
-            </button>
-          <% else %>
-            <%= link_to page, root_path(params.to_unsafe_h.merge(page: page)), 
-              class: "rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100" %>
-          <% end %>
-        <% end %>
-
-        <% if @current_page < @total_pages %>
-          <%= link_to "Next", root_path(params.to_unsafe_h.merge(page: @current_page + 1)), 
-            class: "rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100" %>
-        <% else %>
-          <button disabled
-            class="rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-400 cursor-not-allowed"
-          >
-            Next
-          </button>
-        <% end %>
-      </div>
-
-    </div>
-  </div>
-<% end %>
+<%= render 'shared/table', 
+  records: @events, 
+  columns: @columns, 
+  pagination: {
+    current_page: @current_page,
+    total_pages: @total_pages,
+    total_count: @total_events,
+    path_helper: ->(page) { root_path(params.to_unsafe_h.merge(page: page)) }
+  } 
+%>
 

@@ -10,10 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_01_12_175109) do
+ActiveRecord::Schema[8.0].define(version: 2026_01_21_115529) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
+
+  # Custom types defined in this database.
+  # Note that some types may not work with other database engines. Be careful if changing database.
+  create_enum "ticket_name", ["early_bird", "regular", "vip"]
 
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.string "name", null: false
@@ -82,7 +86,18 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_12_175109) do
     t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_events_on_category_id"
     t.index ["user_id"], name: "index_events_on_user_id"
-    t.check_constraint "status::text = ANY (ARRAY['draft'::character varying, 'published'::character varying, 'cancelled'::character varying, 'out_of_stock'::character varying, 'archived'::character varying]::text[])", name: "status_check"
+    t.check_constraint "status::text = ANY (ARRAY['draft'::character varying::text, 'published'::character varying::text, 'cancelled'::character varying::text, 'out_of_stock'::character varying::text, 'archived'::character varying::text])", name: "status_check"
+  end
+
+  create_table "purchases", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "user_id", null: false
+    t.uuid "ticket_id", null: false
+    t.integer "quantity", null: false
+    t.integer "total_price_cents", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["ticket_id"], name: "index_purchases_on_ticket_id"
+    t.index ["user_id"], name: "index_purchases_on_user_id"
   end
 
   create_table "tickets", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -92,12 +107,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_12_175109) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "quantity_sold", default: 0, null: false
-    t.string "name", default: "Regular", null: false
+    t.enum "ticket_type", default: "regular", null: false, enum_type: "ticket_name"
     t.text "description"
     t.datetime "sales_start_at"
     t.datetime "sales_end_at"
     t.string "currency", default: "EUR", null: false
-    t.index ["event_id", "name"], name: "index_tickets_on_event_id_and_name", unique: true
+    t.index ["event_id", "ticket_type"], name: "index_tickets_on_event_id_and_ticket_type", unique: true
     t.index ["event_id"], name: "index_tickets_on_event_id"
     t.check_constraint "price_cents >= 0", name: "price_cents_non_negative"
     t.check_constraint "quantity_sold <= quantity_total", name: "qty_sold_not_exceed_total"
@@ -122,5 +137,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_01_12_175109) do
   add_foreign_key "comments", "users"
   add_foreign_key "events", "categories"
   add_foreign_key "events", "users"
+  add_foreign_key "purchases", "tickets"
+  add_foreign_key "purchases", "users"
   add_foreign_key "tickets", "events"
 end
